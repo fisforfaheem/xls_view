@@ -6,6 +6,7 @@ import '../../../core/constants/strings.dart';
 import '../../../core/constants/dimensions.dart';
 import '../../../app/routes.dart';
 import '../../../core/services/file_service.dart';
+import '../../../core/services/permission_service.dart';
 import '../../../data/providers/recent_files_provider.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import 'widgets/file_management_illustration.dart';
@@ -155,25 +156,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _handleViewXlsxFile(BuildContext context) async {
+    void _handleViewXlsxFile(BuildContext context) async {
     final fileService = FileService();
+    final permissionService = PermissionService();
     final recentFilesProvider = Provider.of<RecentFilesProvider>(
       context,
       listen: false,
     );
-
+    
     try {
+      // Check and request permissions first
+      final hasPermissions = await permissionService.hasStoragePermissions();
+      
+      if (!hasPermissions) {
+        final granted = await permissionService.requestStoragePermissions();
+        
+        if (!granted) {
+          if (context.mounted) {
+            _showPermissionDeniedDialog(context);
+          }
+          return;
+        }
+      }
+      
       final files = await fileService.pickExcelFiles(allowMultiple: false);
-
+      
       if (files == null || files.isEmpty) {
         return; // User cancelled or no files selected
       }
-
+      
       final file = files.first;
-
+      
       // Add to recent files
       await recentFilesProvider.addRecentFile(file);
-
+      
       // Navigate to file viewer
       if (context.mounted) {
         context.goToFileViewer(file.path);
@@ -189,5 +205,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
       }
     }
+  }
+
+  void _showPermissionDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Storage Permission Required'),
+        content: const Text(
+          'This app needs storage permission to access and view Excel files. Please grant the permission in the next dialog or go to app settings to enable it manually.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(AppStrings.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final permissionService = PermissionService();
+              await permissionService.openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
   }
 }
