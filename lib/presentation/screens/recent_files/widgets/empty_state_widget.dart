@@ -19,13 +19,13 @@ class EmptyStateWidget extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withAlpha(26),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
               ),
               child: Icon(
                 Icons.history_rounded,
                 size: 60,
-                color: AppColors.primary.withOpacity(0.5),
+                color: AppColors.primary.withAlpha(128),
               ),
             ),
 
@@ -45,7 +45,7 @@ class EmptyStateWidget extends StatelessWidget {
 
             // Description
             Text(
-              'Open some Excel files to see them here',
+              'Open some XLS/XLSX files to see them here',
               style: Theme.of(
                 context,
               ).textTheme.bodyLarge?.copyWith(color: AppColors.textSecondary),

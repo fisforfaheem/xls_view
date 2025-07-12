@@ -4,7 +4,7 @@ import '../../../../core/constants/dimensions.dart';
 import '../../../../data/models/excel_data_model.dart';
 
 class ExcelDataTable extends StatefulWidget {
-  final ExcelSheet sheet;
+  final XlsSheet sheet;
   final String searchQuery;
 
   const ExcelDataTable({
@@ -30,7 +30,7 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.sheet.isEmpty) {
+    if (!widget.sheet.hasData) {
       return _buildEmptyState();
     }
 
@@ -79,7 +79,7 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
           ),
           const SizedBox(width: AppDimensions.spacingSm),
           Text(
-            '${widget.sheet.rowCount} rows × ${widget.sheet.columnCount} columns',
+            '${widget.sheet.rows.length} rows × ${widget.sheet.maxColumns} columns',
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
@@ -121,9 +121,10 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
                 child: DataTable(
                   columnSpacing: 20,
                   headingRowHeight: 48,
-                  dataRowHeight: 40,
+                  dataRowMinHeight: 40,
+                  dataRowMaxHeight: 40,
                   headingRowColor: WidgetStateProperty.all(
-                    AppColors.primary.withOpacity(0.1),
+                    AppColors.primary.withAlpha(26),
                   ),
                   columns: _buildColumns(),
                   rows: _buildRows(),
@@ -157,7 +158,7 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
     );
 
     // Add data columns
-    for (int i = 0; i < widget.sheet.columnCount; i++) {
+    for (int i = 0; i < widget.sheet.maxColumns; i++) {
       columns.add(
         DataColumn(
           label: Container(
@@ -204,7 +205,7 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
       );
 
       // Add data cells
-      for (int colIndex = 0; colIndex < widget.sheet.columnCount; colIndex++) {
+      for (int colIndex = 0; colIndex < widget.sheet.maxColumns; colIndex++) {
         final cellValue = widget.sheet.getCellValue(row.index, colIndex);
         final isHighlighted =
             widget.searchQuery.isNotEmpty &&
@@ -225,7 +226,7 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
                       ? FontWeight.bold
                       : FontWeight.normal,
                   backgroundColor: isHighlighted
-                      ? AppColors.primary.withOpacity(0.1)
+                      ? AppColors.primary.withAlpha(26)
                       : null,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -242,7 +243,7 @@ class _ExcelDataTableState extends State<ExcelDataTable> {
     return rows;
   }
 
-  List<ExcelRow> _getFilteredRows() {
+  List<XlsRow> _getFilteredRows() {
     if (widget.searchQuery.isEmpty) {
       return widget.sheet.rows;
     }

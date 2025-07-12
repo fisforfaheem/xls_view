@@ -1,31 +1,38 @@
-class ExcelDataModel {
+class XlsDataModel {
   final String fileName;
-  final List<ExcelSheet> sheets;
+  final List<XlsSheet> sheets;
   final int activeSheetIndex;
   final DateTime lastModified;
 
-  ExcelDataModel({
+  XlsDataModel({
     required this.fileName,
     required this.sheets,
     this.activeSheetIndex = 0,
     required this.lastModified,
   });
 
-  ExcelSheet get activeSheet => sheets[activeSheetIndex];
+  XlsSheet get activeSheet => sheets[activeSheetIndex];
 
-  bool get hasMultipleSheets => sheets.length > 1;
-
+  // Get total number of rows across all sheets
   int get totalRows => sheets.fold(0, (sum, sheet) => sum + sheet.rows.length);
 
-  int get totalCells => sheets.fold(0, (sum, sheet) => sum + sheet.totalCells);
+  // Get total number of cells across all sheets
+  int get totalCells => sheets.fold(
+    0,
+    (sum, sheet) =>
+        sum + sheet.rows.fold(0, (sum, row) => sum + row.cells.length),
+  );
 
-  ExcelDataModel copyWith({
+  // Check if has multiple sheets
+  bool get hasMultipleSheets => sheets.length > 1;
+
+  XlsDataModel copyWith({
     String? fileName,
-    List<ExcelSheet>? sheets,
+    List<XlsSheet>? sheets,
     int? activeSheetIndex,
     DateTime? lastModified,
   }) {
-    return ExcelDataModel(
+    return XlsDataModel(
       fileName: fileName ?? this.fileName,
       sheets: sheets ?? this.sheets,
       activeSheetIndex: activeSheetIndex ?? this.activeSheetIndex,
@@ -34,54 +41,85 @@ class ExcelDataModel {
   }
 }
 
-class ExcelSheet {
+class XlsSheet {
   final String name;
-  final List<ExcelRow> rows;
+  final List<XlsRow> rows;
   final int maxColumns;
 
-  ExcelSheet({
-    required this.name,
-    required this.rows,
-    required this.maxColumns,
-  });
+  XlsSheet({required this.name, required this.rows, this.maxColumns = 0});
 
-  int get totalCells => rows.fold(0, (sum, row) => sum + row.cells.length);
-
-  bool get isEmpty => rows.isEmpty;
-
-  int get rowCount => rows.length;
-
-  int get columnCount => maxColumns;
-
-  // Get cell value at specific position
+  // Get cell value by row and column index
   String getCellValue(int row, int column) {
-    if (row >= rows.length || column >= maxColumns) {
+    if (row >= rows.length) {
       return '';
     }
 
-    final excelRow = rows[row];
-    if (column >= excelRow.cells.length) {
+    final xlsRow = rows[row];
+    if (column >= xlsRow.cells.length) {
       return '';
     }
 
-    return excelRow.cells[column].value;
+    return xlsRow.cells[column].value;
   }
 
-  // Get row data
-  List<String> getRowData(int rowIndex) {
-    if (rowIndex >= rows.length) {
-      return [];
+  // Get cell by row and column index
+  XlsCell? getCell(int row, int column) {
+    if (row >= rows.length) {
+      return null;
     }
 
-    return rows[rowIndex].cells.map((cell) => cell.value).toList();
+    final xlsRow = rows[row];
+    if (column >= xlsRow.cells.length) {
+      return null;
+    }
+
+    return xlsRow.cells[column];
+  }
+
+  // Get row by index
+  XlsRow? getRow(int index) {
+    if (index >= rows.length) {
+      return null;
+    }
+    return rows[index];
+  }
+
+  // Get total number of cells in this sheet
+  int get totalCells => rows.fold(0, (sum, row) => sum + row.cells.length);
+
+  // Get non-empty rows
+  List<XlsRow> get nonEmptyRows => rows.where((row) => row.hasData).toList();
+
+  // Check if sheet has data
+  bool get hasData => rows.any((row) => row.hasData);
+
+  // Search for text in sheet
+  List<XlsCell> searchCells(String query) {
+    final List<XlsCell> results = [];
+    for (final row in rows) {
+      for (final cell in row.cells) {
+        if (cell.value.toLowerCase().contains(query.toLowerCase())) {
+          results.add(cell);
+        }
+      }
+    }
+    return results;
+  }
+
+  // Get column headers (first row)
+  List<String> get columnHeaders {
+    if (rows.isEmpty) return [];
+    return rows.first.cells.map((cell) => cell.value).toList();
+  }
+
+  // Get data rows (excluding first row if it's headers)
+  List<XlsRow> get dataRows {
+    if (rows.length <= 1) return [];
+    return rows.skip(1).toList();
   }
 
   // Get column data
   List<String> getColumnData(int columnIndex) {
-    if (columnIndex >= maxColumns) {
-      return [];
-    }
-
     return rows.map((row) {
       if (columnIndex < row.cells.length) {
         return row.cells[columnIndex].value;
@@ -90,144 +128,137 @@ class ExcelSheet {
     }).toList();
   }
 
-  // Search for text in the sheet
-  List<CellPosition> searchText(String searchText) {
-    final results = <CellPosition>[];
-    final lowerSearchText = searchText.toLowerCase();
-
-    for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      final row = rows[rowIndex];
-      for (int colIndex = 0; colIndex < row.cells.length; colIndex++) {
-        final cell = row.cells[colIndex];
-        if (cell.value.toLowerCase().contains(lowerSearchText)) {
-          results.add(
-            CellPosition(row: rowIndex, column: colIndex, value: cell.value),
-          );
-        }
-      }
-    }
-
-    return results;
+  @override
+  String toString() {
+    return 'XlsSheet(name: $name, rows: ${rows.length}, maxColumns: $maxColumns)';
   }
 }
 
-class ExcelRow {
+class XlsRow {
   final int index;
-  final List<ExcelCell> cells;
+  final List<XlsCell> cells;
 
-  ExcelRow({required this.index, required this.cells});
+  XlsRow({required this.index, required this.cells});
 
-  bool get isEmpty => cells.isEmpty;
-
-  int get cellCount => cells.length;
+  // Check if row has any data
+  bool get hasData => cells.any((cell) => cell.value.isNotEmpty);
 
   // Get cell by column index
-  ExcelCell? getCellByIndex(int columnIndex) {
+  XlsCell? getCellByIndex(int columnIndex) {
     if (columnIndex >= cells.length) {
       return null;
     }
     return cells[columnIndex];
   }
+
+  @override
+  String toString() {
+    return 'XlsRow(index: $index, cells: ${cells.length})';
+  }
 }
 
-class ExcelCell {
+class XlsCell {
   final String value;
-  final ExcelCellType type;
+  final XlsCellType type;
   final int row;
   final int column;
 
-  ExcelCell({
+  XlsCell({
     required this.value,
     required this.type,
     required this.row,
     required this.column,
   });
 
-  bool get isEmpty => value.isEmpty;
+  // Type checks
+  bool get isNumeric => type == XlsCellType.number;
 
-  bool get isNumeric => type == ExcelCellType.number;
+  bool get isText => type == XlsCellType.text;
 
-  bool get isText => type == ExcelCellType.text;
+  bool get isDate => type == XlsCellType.date;
 
-  bool get isDate => type == ExcelCellType.date;
-
-  bool get isBoolean => type == ExcelCellType.boolean;
+  bool get isBoolean => type == XlsCellType.boolean;
 
   // Get formatted value based on type
   String get formattedValue {
     switch (type) {
-      case ExcelCellType.number:
-        final num? number = num.tryParse(value);
-        if (number != null) {
-          if (number == number.toInt()) {
-            return number.toInt().toString();
-          }
-          return number.toStringAsFixed(2);
+      case XlsCellType.number:
+        final num = double.tryParse(value);
+        if (num != null && num == num.toInt()) {
+          return num.toInt().toString();
         }
         return value;
-      case ExcelCellType.date:
-        final DateTime? date = DateTime.tryParse(value);
-        if (date != null) {
-          return '${date.day}/${date.month}/${date.year}';
-        }
+      case XlsCellType.date:
+        // TODO: Implement date formatting
         return value;
-      case ExcelCellType.boolean:
+      case XlsCellType.boolean:
         return value.toLowerCase() == 'true' ? 'Yes' : 'No';
-      default:
+      case XlsCellType.text:
+      case XlsCellType.formula:
         return value;
     }
   }
 
-  // Get cell reference (e.g., A1, B2)
-  String get cellReference {
-    return '${_getColumnLetter(column)}${row + 1}';
+  // Get numeric value
+  double? get numericValue {
+    if (type == XlsCellType.number) {
+      return double.tryParse(value);
+    }
+    return null;
   }
 
-  String _getColumnLetter(int columnIndex) {
-    String result = '';
-    while (columnIndex >= 0) {
-      result = String.fromCharCode(65 + (columnIndex % 26)) + result;
-      columnIndex = (columnIndex / 26).floor() - 1;
+  // Get boolean value
+  bool? get booleanValue {
+    if (type == XlsCellType.boolean) {
+      return value.toLowerCase() == 'true';
     }
-    return result;
+    return null;
+  }
+
+  // Check if cell is empty
+  bool get isEmpty => value.isEmpty;
+
+  // Check if cell has data
+  bool get hasData => value.isNotEmpty;
+
+  @override
+  String toString() {
+    return 'XlsCell(value: $value, type: $type, row: $row, column: $column)';
   }
 }
 
-enum ExcelCellType { text, number, date, boolean, formula }
+enum XlsCellType { text, number, date, boolean, formula }
 
-class CellPosition {
-  final int row;
-  final int column;
-  final String value;
-
-  CellPosition({required this.row, required this.column, required this.value});
-
-  String get cellReference {
-    return '${_getColumnLetter(column)}${row + 1}';
-  }
-
-  String _getColumnLetter(int columnIndex) {
-    String result = '';
-    while (columnIndex >= 0) {
-      result = String.fromCharCode(65 + (columnIndex % 26)) + result;
-      columnIndex = (columnIndex / 26).floor() - 1;
+// Extension for XlsCellType
+extension XlsCellTypeExtension on XlsCellType {
+  String get displayName {
+    switch (this) {
+      case XlsCellType.text:
+        return 'Text';
+      case XlsCellType.number:
+        return 'Number';
+      case XlsCellType.date:
+        return 'Date';
+      case XlsCellType.boolean:
+        return 'Boolean';
+      case XlsCellType.formula:
+        return 'Formula';
     }
-    return result;
   }
 }
 
-class ExcelParseResult {
-  final ExcelDataModel? data;
+class XlsParseResult {
+  final XlsDataModel? data;
   final String? error;
   final bool success;
 
-  ExcelParseResult({this.data, this.error, required this.success});
+  XlsParseResult({this.data, this.error, required this.success});
 
-  factory ExcelParseResult.success(ExcelDataModel data) {
-    return ExcelParseResult(data: data, success: true);
+  factory XlsParseResult.success(XlsDataModel data) {
+    return XlsParseResult(data: data, success: true);
   }
 
-  factory ExcelParseResult.error(String error) {
-    return ExcelParseResult(error: error, success: false);
+  factory XlsParseResult.error(String error) {
+    return XlsParseResult(error: error, success: false);
   }
 }

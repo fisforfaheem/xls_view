@@ -6,7 +6,7 @@ import '../../../../data/models/excel_data_model.dart';
 
 class FileInfoCard extends StatelessWidget {
   final String filePath;
-  final ExcelDataModel? excelData;
+  final XlsDataModel? excelData;
 
   const FileInfoCard({super.key, required this.filePath, this.excelData});
 
@@ -59,7 +59,7 @@ class FileInfoCard extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withAlpha(26),
             borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
           ),
           child: Icon(Icons.info_outline, color: AppColors.primary, size: 20),
@@ -198,7 +198,7 @@ class FileInfoCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withAlpha(26),
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusXs,
                           ),
@@ -218,7 +218,7 @@ class FileInfoCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Rows: ${sheet.rowCount}',
+                      'Rows: ${sheet.rows.length}',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -226,7 +226,7 @@ class FileInfoCard extends StatelessWidget {
                     ),
                     const SizedBox(width: AppDimensions.spacingMd),
                     Text(
-                      'Columns: ${sheet.columnCount}',
+                      'Columns: ${sheet.maxColumns}',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -315,8 +315,8 @@ class FileInfoCard extends StatelessWidget {
   void _shareFile() {
     Share.shareXFiles(
       [XFile(filePath)],
-      subject: excelData?.fileName ?? 'Excel File',
-      text: 'Sharing Excel file: ${excelData?.fileName ?? 'file'}',
+      subject: excelData?.fileName ?? 'XLS File',
+      text: 'Sharing XLS file: ${excelData?.fileName ?? 'file'}',
     );
   }
 }

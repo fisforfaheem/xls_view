@@ -120,7 +120,7 @@ class _AboutScreenState extends State<AboutScreen>
               borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withAlpha(77),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -150,7 +150,7 @@ class _AboutScreenState extends State<AboutScreen>
             vertical: AppDimensions.paddingSm,
           ),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withAlpha(26),
             borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
           ),
           child: Text(
@@ -369,7 +369,7 @@ class _AboutScreenState extends State<AboutScreen>
   void _shareApp() {
     Share.share(
       'Check out ${AppStrings.appName} - A modern XLS file reader app!\n\n'
-      'View and manage your Excel files with ease.',
+      'View and manage your XLS/XLSX files with ease.',
       subject: 'Share ${AppStrings.appName}',
     );
   }
@@ -419,7 +419,7 @@ class _AboutScreenState extends State<AboutScreen>
           child: Text(
             'Terms of Service\n\n'
             'By using this app, you agree to the following terms:\n\n'
-            'Use License: This app is provided for viewing Excel files only.\n\n'
+            'Use License: This app is provided for viewing XLS/XLSX files only.\n\n'
             'File Responsibility: You are responsible for the files you open and share.\n\n'
             'No Warranty: The app is provided "as is" without warranty.\n\n'
             'Updates: We may update these terms from time to time.\n\n'

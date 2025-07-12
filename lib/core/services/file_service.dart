@@ -12,8 +12,8 @@ class FileService {
   // Maximum file size (50MB)
   static const int _maxFileSize = 50 * 1024 * 1024;
 
-  /// Pick Excel files from device storage
-  Future<List<FileModel>?> pickExcelFiles({bool allowMultiple = false}) async {
+  /// Pick XLS/XLSX files from device storage
+  Future<List<FileModel>?> pickXlsFiles({bool allowMultiple = false}) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,

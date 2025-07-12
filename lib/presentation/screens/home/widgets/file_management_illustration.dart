@@ -41,7 +41,7 @@ class FileManagementIllustration extends StatelessWidget {
                       horizontal: AppDimensions.paddingMd,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withAlpha(26),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(AppDimensions.radiusMd),
                       ),
@@ -227,7 +227,7 @@ class FileManagementIllustration extends StatelessWidget {
   Widget _buildFileFolder(int index) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withAlpha(26),
         borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
       ),
       child: Column(

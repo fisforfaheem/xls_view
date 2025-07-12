@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import '../models/file_model.dart';
-import 'dart:math';
+
 
 class RecentFilesProvider extends ChangeNotifier {
   static const String _boxName = 'recent_files';
@@ -36,10 +36,7 @@ class RecentFilesProvider extends ChangeNotifier {
       // Load existing files
       _loadRecentFiles();
 
-      // Add some sample data if no files exist (for demo purposes)
-      if (_recentFiles.isEmpty) {
-        await _addSampleFiles();
-      }
+      // Files will be populated when user opens XLS/XLSX files
 
       _isLoading = false;
       notifyListeners();
@@ -168,55 +165,7 @@ class RecentFilesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Add sample files for demo
-  Future<void> _addSampleFiles() async {
-    final sampleFiles = [
-      FileModel(
-        id: 'sample_1',
-        name: 'Sales_Report_2024.xlsx',
-        path: '/documents/Sales_Report_2024.xlsx',
-        lastOpened: DateTime.now().subtract(const Duration(hours: 2)),
-        size: 1024 * 500, // 500KB
-        type: 'xlsx',
-      ),
-      FileModel(
-        id: 'sample_2',
-        name: 'Employee_Data.xlsx',
-        path: '/documents/Employee_Data.xlsx',
-        lastOpened: DateTime.now().subtract(const Duration(days: 1)),
-        size: 1024 * 1024 * 2, // 2MB
-        type: 'xlsx',
-      ),
-      FileModel(
-        id: 'sample_3',
-        name: 'Budget_Analysis.xls',
-        path: '/documents/Budget_Analysis.xls',
-        lastOpened: DateTime.now().subtract(const Duration(days: 2)),
-        size: 1024 * 750, // 750KB
-        type: 'xls',
-      ),
-      FileModel(
-        id: 'sample_4',
-        name: 'Inventory_List.xlsx',
-        path: '/documents/Inventory_List.xlsx',
-        lastOpened: DateTime.now().subtract(const Duration(days: 3)),
-        size: 1024 * 1024 * 1, // 1MB
-        type: 'xlsx',
-      ),
-      FileModel(
-        id: 'sample_5',
-        name: 'Customer_Database.xlsx',
-        path: '/documents/Customer_Database.xlsx',
-        lastOpened: DateTime.now().subtract(const Duration(days: 5)),
-        size: 1024 * 1024 * 3, // 3MB
-        type: 'xlsx',
-      ),
-    ];
 
-    for (final file in sampleFiles) {
-      await addRecentFile(file);
-    }
-  }
 
   // Get file by ID
   FileModel? getFileById(String id) {

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/strings.dart';
+
 import '../../../core/constants/dimensions.dart';
 import '../../../core/services/excel_parser_service.dart';
 import '../../../data/models/excel_data_model.dart';
-import '../../../data/providers/recent_files_provider.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/common/loading_widget.dart';
 import 'widgets/excel_data_table.dart';
@@ -26,8 +24,8 @@ class _FileViewerScreenState extends State<FileViewerScreen>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
-  final ExcelParserService _excelParser = ExcelParserService();
-  ExcelDataModel? _excelData;
+  final XlsParserService _xlsParser = XlsParserService();
+  XlsDataModel? _xlsData;
   bool _isLoading = true;
   String? _errorMessage;
   int _activeSheetIndex = 0;
@@ -60,11 +58,11 @@ class _FileViewerScreenState extends State<FileViewerScreen>
         _errorMessage = null;
       });
 
-      final parseResult = await _excelParser.parseExcelFile(widget.filePath);
+      final parseResult = await _xlsParser.parseXlsFile(widget.filePath);
 
       if (parseResult.success && parseResult.data != null) {
         setState(() {
-          _excelData = parseResult.data;
+          _xlsData = parseResult.data;
           _isLoading = false;
         });
 
@@ -89,10 +87,10 @@ class _FileViewerScreenState extends State<FileViewerScreen>
   }
 
   void _updateRecentFiles() {
-    final recentFilesProvider = Provider.of<RecentFilesProvider>(
-      context,
-      listen: false,
-    );
+          // final recentFilesProvider = Provider.of<RecentFilesProvider>(
+      //   context,
+      //   listen: false,
+      // );
     // This would typically create a FileModel from the current file
     // For now, we'll skip this implementation
   }
@@ -109,7 +107,7 @@ class _FileViewerScreenState extends State<FileViewerScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CustomAppBar(
-        title: _excelData?.fileName ?? 'File Viewer',
+        title: _xlsData?.fileName ?? 'File Viewer',
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -129,14 +127,14 @@ class _FileViewerScreenState extends State<FileViewerScreen>
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const LoadingWidget(message: 'Loading Excel file...');
+      return const LoadingWidget(message: 'Loading XLS file...');
     }
 
     if (_errorMessage != null) {
       return _buildErrorView();
     }
 
-    if (_excelData == null) {
+    if (_xlsData == null) {
       return _buildErrorView();
     }
 
@@ -148,7 +146,7 @@ class _FileViewerScreenState extends State<FileViewerScreen>
           _buildSearchBar(),
 
           // Sheet tabs (if multiple sheets)
-          if (_excelData!.hasMultipleSheets) _buildSheetTabs(),
+          if (_xlsData!.hasMultipleSheets) _buildSheetTabs(),
 
           // Data table
           Expanded(child: _buildDataTable()),
@@ -235,7 +233,7 @@ class _FileViewerScreenState extends State<FileViewerScreen>
 
   Widget _buildSheetTabs() {
     return SheetTabs(
-      sheets: _excelData!.sheets,
+      sheets: _xlsData!.sheets,
       activeIndex: _activeSheetIndex,
       onSheetChanged: (index) {
         setState(() {
@@ -246,7 +244,7 @@ class _FileViewerScreenState extends State<FileViewerScreen>
   }
 
   Widget _buildDataTable() {
-    final activeSheet = _excelData!.sheets[_activeSheetIndex];
+    final activeSheet = _xlsData!.sheets[_activeSheetIndex];
 
     return ExcelDataTable(sheet: activeSheet, searchQuery: _searchQuery);
   }
@@ -255,7 +253,7 @@ class _FileViewerScreenState extends State<FileViewerScreen>
     showDialog(
       context: context,
       builder: (context) =>
-          FileInfoCard(filePath: widget.filePath, excelData: _excelData),
+          FileInfoCard(filePath: widget.filePath, excelData: _xlsData),
     );
   }
 }

@@ -95,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        AppColors.primary.withOpacity(0.1),
+                        AppColors.primary.withAlpha(26),
                         AppColors.background,
                       ],
                     ),
@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                           width: 200,
                           height: 200,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withAlpha(26),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -125,7 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
                           width: 150,
                           height: 150,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight.withOpacity(0.1),
+                            color: AppColors.primaryLight.withAlpha(26),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -159,7 +159,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.3),
+                                    color: AppColors.primary.withAlpha(77),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),
@@ -229,7 +229,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                             elevation: 4,
-                            shadowColor: AppColors.primary.withOpacity(0.4),
+                            shadowColor: AppColors.primary.withAlpha(102),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

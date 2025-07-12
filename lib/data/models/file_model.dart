@@ -65,7 +65,7 @@ class FileModel extends HiveObject {
     }
   }
 
-  bool get isExcelFile {
+  bool get isXlsFile {
     return extension == 'xlsx' || extension == 'xls';
   }
 

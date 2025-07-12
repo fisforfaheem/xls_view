@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
+
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/constants/dimensions.dart';
@@ -279,7 +279,7 @@ class _RecentFilesScreenState extends State<RecentFilesScreen>
     provider.addRecentFile(file.copyWith(lastOpened: DateTime.now()));
 
     // Navigate to file viewer
-    context.goToFileViewer(file.path);
+    context.pushFileViewer(file.path);
   }
 
   void _deleteFile(RecentFilesProvider provider, FileModel file) {

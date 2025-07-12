@@ -94,7 +94,7 @@ class _FileItemState extends State<FileItem>
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: _getFileIconColor().withOpacity(0.1),
+                            color: _getFileIconColor().withAlpha(26),
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusMd,
                             ),
@@ -137,9 +137,7 @@ class _FileItemState extends State<FileItem>
                                       vertical: AppDimensions.paddingXs,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _getFileIconColor().withOpacity(
-                                        0.1,
-                                      ),
+                                      color: _getFileIconColor().withAlpha(26),
                                       borderRadius: BorderRadius.circular(
                                         AppDimensions.radiusXs,
                                       ),

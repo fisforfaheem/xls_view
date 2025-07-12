@@ -74,7 +74,7 @@ class _ActionButtonState extends State<ActionButton>
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withAlpha(51),
                   width: 1,
                 ),
                 boxShadow: [
@@ -99,7 +99,7 @@ class _ActionButtonState extends State<ActionButton>
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withAlpha(26),
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusMd,
                             ),

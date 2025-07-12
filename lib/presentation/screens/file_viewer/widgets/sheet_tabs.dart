@@ -4,7 +4,7 @@ import '../../../../core/constants/dimensions.dart';
 import '../../../../data/models/excel_data_model.dart';
 
 class SheetTabs extends StatefulWidget {
-  final List<ExcelSheet> sheets;
+  final List<XlsSheet> sheets;
   final int activeIndex;
   final Function(int) onSheetChanged;
 
@@ -67,7 +67,7 @@ class _SheetTabsState extends State<SheetTabs> {
     );
   }
 
-  Widget _buildSheetTab(ExcelSheet sheet, int index, bool isActive) {
+  Widget _buildSheetTab(XlsSheet sheet, int index, bool isActive) {
     return GestureDetector(
       onTap: () => widget.onSheetChanged(index),
       child: Container(
@@ -85,7 +85,7 @@ class _SheetTabsState extends State<SheetTabs> {
           boxShadow: isActive
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.2),
+                    color: AppColors.primary.withAlpha(51),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -122,12 +122,12 @@ class _SheetTabsState extends State<SheetTabs> {
               ),
               decoration: BoxDecoration(
                 color: isActive
-                    ? Colors.white.withOpacity(0.2)
-                    : AppColors.primary.withOpacity(0.1),
+                    ? Colors.white.withAlpha(51)
+                    : AppColors.primary.withAlpha(26),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
               ),
               child: Text(
-                '${sheet.rowCount}',
+                '${sheet.rows.length}',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: isActive ? Colors.white : AppColors.primary,
                   fontWeight: FontWeight.w600,
