@@ -35,6 +35,9 @@ class _RecentFilesScreenState extends State<RecentFilesScreen>
     super.initState();
     _setupAnimations();
     _initializeProvider();
+    _searchController.addListener(() {
+      setState(() {});
+    });
   }
 
   void _setupAnimations() {
