@@ -1,7 +1,7 @@
 class AppStrings {
   // App Info
-  static const String appName = 'Xlsx FileReader';
-  static const String appDescription = 'A modern XLS file reader app';
+  static const String appName = 'XLSX File Viewer';
+  static const String appDescription = 'A modern XLSX file reader app';
   static const String appVersion = '1.0.0';
 
   // Splash Screen
@@ -36,9 +36,9 @@ class AppStrings {
   static const String resetZoom = 'Reset Zoom';
 
   // About Screen
-  static const String aboutTitle = 'About Xlsx FileReader';
+  static const String aboutTitle = 'About XLSX File Viewer';
   static const String aboutDescription =
-      'A modern and intuitive XLS file reader app built with Flutter. View, manage, and share your Excel files with ease.';
+      'A modern and intuitive XLSX file reader app built with Flutter. View, manage, and share your Excel files with ease.';
   static const String version = 'Version';
   static const String developer = 'Developer';
   static const String contact = 'Contact';
@@ -76,7 +76,7 @@ class AppStrings {
   static const String fileDeletedSuccessfully = 'File deleted successfully';
 
   // File Types
-  static const String xlsFiles = 'XLS Files';
+  static const String xlsFiles = 'XLSX Files';
   static const String xlsxFiles = 'XLSX Files';
   static const String allSupportedFiles = 'All Supported Files';
 }

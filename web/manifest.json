@@ -1,6 +1,6 @@
 {
-    "name": "xls_view",
-    "short_name": "xls_view",
+    "name": "XLSX File Viewer",
+    "short_name": "XLSX Viewer",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

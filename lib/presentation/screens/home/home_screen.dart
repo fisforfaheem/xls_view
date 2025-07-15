@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
@@ -8,8 +7,6 @@ import '../../../app/routes.dart';
 import '../../../core/services/file_service.dart';
 import '../../../data/providers/recent_files_provider.dart';
 import '../../widgets/common/custom_app_bar.dart';
-import 'widgets/file_management_illustration.dart';
-import 'widgets/action_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,32 +65,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const CustomAppBar(title: AppStrings.home, showBackButton: false),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.screenPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: AppDimensions.spacingLg),
-
-                // File Management Illustration
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: const FileManagementIllustration(),
+      body: Column(
+        children: [
+          // Main content area with illustration
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              color: AppColors.background,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppDimensions.paddingLg),
+                    child: Image.asset(
+                      'assets/images/background image.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
+              ),
+            ),
+          ),
 
-                const SizedBox(height: AppDimensions.spacingXxl),
-
-                // Action Buttons
-                SlideTransition(
+          // Bottom action buttons section
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingXl),
+                child: SlideTransition(
                   position: _slideAnimation,
                   child: FadeTransition(
                     opacity: _fadeAnimation,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         // View xlsx File Button
-                        ActionButton(
+                        _buildStyledButton(
                           icon: Icons.table_view_rounded,
                           title: AppStrings.viewXlsxFile,
                           onPressed: () => _handleViewXlsxFile(context),
@@ -103,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const SizedBox(height: AppDimensions.spacingLg),
 
                         // Recent Files Button
-                        ActionButton(
+                        _buildStyledButton(
                           icon: Icons.history_rounded,
                           title: AppStrings.recentFilesButton,
                           onPressed: () => context.pushRecentFiles(),
@@ -113,8 +128,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const SizedBox(height: AppDimensions.spacingLg),
 
                         // About Us Button
-                        ActionButton(
-                          icon: Icons.info_outline_rounded,
+                        _buildStyledButton(
+                          icon: Icons.person_outline_rounded,
                           title: AppStrings.aboutUsButton,
                           onPressed: () => context.pushAbout(),
                           delay: 200,
@@ -123,32 +138,76 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                const SizedBox(height: AppDimensions.spacingXl),
-
-                // Bottom decorative element
-                FadeTransition(
-                  opacity: _fadeAnimation,
+  Widget _buildStyledButton({
+    required IconData icon,
+    required String title,
+    required VoidCallback onPressed,
+    required int delay,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+          onTap: onPressed,
+          child: Row(
+            children: [
+              // Left arrow section
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                ),
+                child: ClipPath(
+                  clipper: _ArrowClipper(),
                   child: Container(
-                    height: 100,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          AppColors.background,
-                          AppColors.primary.withAlpha(26),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusXl,
-                      ),
+                    color: AppColors.primary,
+                    child: Icon(
+                      icon,
+                      size: 24,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              
+              // Title section
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingMd),
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -190,4 +249,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     }
   }
+}
+
+class _ArrowClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    
+    // Start from top-left
+    path.moveTo(0, 0);
+    
+    // Line to top-right minus arrow width
+    path.lineTo(size.width - 15, 0);
+    
+    // Arrow point to the right
+    path.lineTo(size.width, size.height / 2);
+    
+    // Line back to bottom-right minus arrow width
+    path.lineTo(size.width - 15, size.height);
+    
+    // Line to bottom-left
+    path.lineTo(0, size.height);
+    
+    // Close the path
+    path.close();
+    
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

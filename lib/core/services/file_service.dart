@@ -7,7 +7,7 @@ import '../../data/models/file_model.dart';
 
 class FileService {
   // Supported file extensions
-  static const List<String> _supportedExtensions = ['xls', 'xlsx'];
+  static const List<String> _supportedExtensions = ['xlsx'];
 
   // Maximum file size (50MB)
   static const int _maxFileSize = 50 * 1024 * 1024;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/constants/dimensions.dart';
@@ -34,7 +33,6 @@ class _RecentFilesScreenState extends State<RecentFilesScreen>
   void initState() {
     super.initState();
     _setupAnimations();
-    _initializeProvider();
     _searchController.addListener(() {
       setState(() {});
     });
@@ -68,13 +66,6 @@ class _RecentFilesScreenState extends State<RecentFilesScreen>
     _fadeController.forward();
     await Future.delayed(const Duration(milliseconds: 300));
     _listController.forward();
-  }
-
-  void _initializeProvider() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<RecentFilesProvider>(context, listen: false);
-      provider.init();
-    });
   }
 
   @override

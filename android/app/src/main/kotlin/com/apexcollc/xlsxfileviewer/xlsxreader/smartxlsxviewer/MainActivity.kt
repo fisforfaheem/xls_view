@@ -1,4 +1,4 @@
-package com.example.xls_view
+package com.apexcollc.xlsxfileviewer.xlsxreader.smartxlsxviewer
 
 import io.flutter.embedding.android.FlutterActivity
 

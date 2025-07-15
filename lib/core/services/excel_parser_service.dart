@@ -6,28 +6,25 @@ import '../../data/models/excel_data_model.dart';
 class XlsParserService {
   /// Parse XLS/XLSX file and convert to XlsDataModel
   Future<XlsParseResult> parseXlsFile(String filePath) async {
+    return compute(_parseInIsolate, filePath);
+  }
+
+  /// Parse XLS/XLSX file in a separate isolate to prevent UI freeze
+  static Future<XlsParseResult> _parseInIsolate(String filePath) async {
     try {
-      // Check if file exists
       final file = File(filePath);
       if (!await file.exists()) {
         return XlsParseResult.error('File not found');
       }
 
-      // Read file bytes
       final bytes = await file.readAsBytes();
-      final fileName = file.path.split('/').last;
-      final lastModified = await file.lastModified();
-
-      // Parse XLS/XLSX file
       final excel = Excel.decodeBytes(bytes);
 
       if (excel.sheets.isEmpty) {
-        return XlsParseResult.error('No sheets found in the XLS file');
+        return XlsParseResult.error('No sheets found in the XLSX file');
       }
 
-      // Convert to our data model
       final sheets = <XlsSheet>[];
-
       for (final sheetName in excel.sheets.keys) {
         final sheet = excel.sheets[sheetName];
         if (sheet == null) continue;
@@ -43,23 +40,23 @@ class XlsParserService {
       }
 
       final xlsData = XlsDataModel(
-        fileName: fileName,
+        fileName: file.path.split('/').last,
         sheets: sheets,
         activeSheetIndex: 0,
-        lastModified: lastModified,
+        lastModified: await file.lastModified(),
       );
 
       return XlsParseResult.success(xlsData);
     } catch (e) {
       if (kDebugMode) {
-        print('Error parsing XLS file: $e');
+        print('Error parsing XLSX file in isolate: $e');
       }
-      return XlsParseResult.error('Failed to parse XLS file: ${e.toString()}');
+      return XlsParseResult.error('Failed to parse XLSX file: ${e.toString()}');
     }
   }
 
   /// Parse a single sheet
-  Future<XlsSheet?> _parseSheet(Sheet sheet, String sheetName) async {
+  static Future<XlsSheet?> _parseSheet(Sheet sheet, String sheetName) async {
     try {
       final rows = <XlsRow>[];
       int maxColumns = 0;
@@ -107,19 +104,23 @@ class XlsParserService {
   }
 
   /// Get cell value as string
-  String _getCellValue(Data? cell) {
+  static String _getCellValue(Data? cell) {
     if (cell == null || cell.value == null) {
       return '';
     }
 
     final value = cell.value;
 
+    if (value is SharedString) {
+      return value.toString();
+    }
+
     // Convert to string based on type
     return value.toString();
   }
 
   /// Determine cell type
-  XlsCellType _getCellType(Data? cell) {
+  static XlsCellType _getCellType(Data? cell) {
     if (cell == null || cell.value == null) {
       return XlsCellType.text;
     }
@@ -135,134 +136,5 @@ class XlsParserService {
     }
 
     return XlsCellType.text;
-  }
-
-  /// Get sheet names from XLS/XLSX file
-  Future<List<String>> getSheetNames(String filePath) async {
-    try {
-      final file = File(filePath);
-      if (!await file.exists()) {
-        return [];
-      }
-
-      final bytes = await file.readAsBytes();
-      final excel = Excel.decodeBytes(bytes);
-
-      return excel.sheets.keys.toList();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting sheet names: $e');
-      }
-      return [];
-    }
-  }
-
-  /// Get basic file info
-  Future<Map<String, dynamic>> getFileInfo(String filePath) async {
-    try {
-      final file = File(filePath);
-      if (!await file.exists()) {
-        return {};
-      }
-
-      final bytes = await file.readAsBytes();
-      final excel = Excel.decodeBytes(bytes);
-
-      int totalSheets = excel.sheets.length;
-      int totalRows = 0;
-      int totalCells = 0;
-
-      for (final sheet in excel.sheets.values) {
-        totalRows += sheet.maxRows;
-        totalCells += sheet.maxRows * sheet.maxColumns;
-      }
-
-      return {
-        'totalSheets': totalSheets,
-        'totalRows': totalRows,
-        'totalCells': totalCells,
-        'sheetNames': excel.sheets.keys.toList(),
-        'fileSize': await file.length(),
-        'lastModified': await file.lastModified(),
-      };
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting file info: $e');
-      }
-      return {};
-    }
-  }
-
-  /// Validate XLS/XLSX file
-  Future<bool> validateXlsFile(String filePath) async {
-    try {
-      final file = File(filePath);
-      if (!await file.exists()) {
-        return false;
-      }
-
-      // Check file extension
-      final fileName = file.path.toLowerCase();
-      if (!fileName.endsWith('.xls') && !fileName.endsWith('.xlsx')) {
-        return false;
-      }
-
-      // Try to parse the file
-      final bytes = await file.readAsBytes();
-      final excel = Excel.decodeBytes(bytes);
-
-      return excel.sheets.isNotEmpty;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error validating XLS file: $e');
-      }
-      return false;
-    }
-  }
-
-  /// Get file statistics
-  Future<Map<String, dynamic>> getFileStats(String filePath) async {
-    try {
-      final parseResult = await parseXlsFile(filePath);
-      if (!parseResult.success || parseResult.data == null) {
-        return {};
-      }
-
-      final xlsData = parseResult.data!;
-      int totalRows = 0;
-      int totalCells = 0;
-      int nonEmptyRows = 0;
-      int nonEmptyCells = 0;
-
-      for (final sheet in xlsData.sheets) {
-        totalRows += sheet.rows.length;
-        for (final row in sheet.rows) {
-          if (row.hasData) {
-            nonEmptyRows++;
-          }
-          totalCells += row.cells.length;
-          for (final cell in row.cells) {
-            if (cell.hasData) {
-              nonEmptyCells++;
-            }
-          }
-        }
-      }
-
-      return {
-        'totalSheets': xlsData.sheets.length,
-        'totalRows': totalRows,
-        'totalCells': totalCells,
-        'nonEmptyRows': nonEmptyRows,
-        'nonEmptyCells': nonEmptyCells,
-        'fileName': xlsData.fileName,
-        'lastModified': xlsData.lastModified,
-      };
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting file stats: $e');
-      }
-      return {};
-    }
   }
 }

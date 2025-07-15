@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:path/path.dart' as path;
 import '../../../core/constants/colors.dart';
-
 import '../../../core/constants/dimensions.dart';
 import '../../../core/services/excel_parser_service.dart';
 import '../../../data/models/excel_data_model.dart';
+import '../../../data/models/file_model.dart';
+import '../../../data/providers/recent_files_provider.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/common/loading_widget.dart';
 import 'widgets/excel_data_table.dart';
@@ -87,12 +90,29 @@ class _FileViewerScreenState extends State<FileViewerScreen>
   }
 
   void _updateRecentFiles() {
-          // final recentFilesProvider = Provider.of<RecentFilesProvider>(
-      //   context,
-      //   listen: false,
-      // );
-    // This would typically create a FileModel from the current file
-    // For now, we'll skip this implementation
+    try {
+      final recentFilesProvider = Provider.of<RecentFilesProvider>(
+        context,
+        listen: false,
+      );
+      
+      // Create FileModel from current file
+      final fileName = path.basename(widget.filePath);
+      final fileExtension = path.extension(widget.filePath).toLowerCase().substring(1);
+      
+      final fileModel = FileModel(
+        id: widget.filePath.hashCode.toString(),
+        name: fileName,
+        path: widget.filePath,
+        size: 0, // Size will be calculated later if needed
+        type: fileExtension,
+        lastOpened: DateTime.now(),
+      );
+      
+      recentFilesProvider.addRecentFile(fileModel);
+         } catch (e) {
+       debugPrint('Error updating recent files: $e');
+     }
   }
 
   @override
@@ -127,7 +147,7 @@ class _FileViewerScreenState extends State<FileViewerScreen>
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const LoadingWidget(message: 'Loading XLS file...');
+              return const LoadingWidget(message: 'Loading XLSX file...');
     }
 
     if (_errorMessage != null) {

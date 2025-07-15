@@ -11,10 +11,12 @@ class XlsViewApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => RecentFilesProvider()),
+        ChangeNotifierProvider(
+          create: (context) => RecentFilesProvider()..init(),
+        ),
       ],
       child: MaterialApp.router(
-        title: 'Xlsx FileReader',
+        title: 'XLSX File Viewer',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         routerConfig: AppRoutes.router,

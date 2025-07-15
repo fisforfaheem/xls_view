@@ -1,4 +1,4 @@
-# XLS File Reader App - Development Plan
+# XLSX File Reader App - Development Plan
 
 ## App Overview
 A modern Flutter application for reading and viewing XLS/XLSX files with a clean, user-friendly interface featuring a green color scheme.
@@ -309,4 +309,4 @@ lib/
 - User retention > 70%
 - App store rating > 4.5 stars
 
-This plan provides a comprehensive roadmap for building a modern, efficient XLS file reader app with excellent user experience and robust functionality. 
+This plan provides a comprehensive roadmap for building a modern, efficient XLSX file reader app with excellent user experience and robust functionality. 

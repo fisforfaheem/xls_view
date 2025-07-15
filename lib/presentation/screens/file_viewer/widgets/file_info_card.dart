@@ -315,8 +315,8 @@ class FileInfoCard extends StatelessWidget {
   void _shareFile() {
     Share.shareXFiles(
       [XFile(filePath)],
-      subject: excelData?.fileName ?? 'XLS File',
-      text: 'Sharing XLS file: ${excelData?.fileName ?? 'file'}',
+      subject: excelData?.fileName ?? 'XLSX File',
+      text: 'Sharing XLSX file: ${excelData?.fileName ?? 'file'}',
     );
   }
 }

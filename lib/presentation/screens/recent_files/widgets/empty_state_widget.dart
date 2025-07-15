@@ -45,7 +45,7 @@ class EmptyStateWidget extends StatelessWidget {
 
             // Description
             Text(
-              'Open some XLS/XLSX files to see them here',
+                              'Open some XLSX files to see them here',
               style: Theme.of(
                 context,
               ).textTheme.bodyLarge?.copyWith(color: AppColors.textSecondary),

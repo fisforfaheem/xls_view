@@ -1,3 +1,3 @@
-# xls_view
+# xlsx_view
 
-A new Flutter project.
+A modern Flutter XLSX file reader app with clean UI and file management features.
