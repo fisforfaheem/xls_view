@@ -1,6 +1,5 @@
 name: xlsx_view
 description: "A modern Flutter XLSX file reader app with clean UI and file management features."
-publish_to: 'none'
 version: 1.0.0+1
 
 environment:
@@ -38,6 +37,7 @@ dependencies:
   
   # Sharing
   share_plus: ^9.0.0
+  url_launcher: ^6.2.4
   
   # Permissions
   permission_handler: ^11.3.1
